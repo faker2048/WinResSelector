@@ -110,7 +110,6 @@ namespace WinResSelector.ViewModels
         public ICommand AddProfileCommand { get; }
         public ICommand DeleteProfileCommand { get; }
         public ICommand TestProfileCommand { get; }
-        public ICommand SaveCommand { get; }
         public ICommand ShowWindowCommand { get; }
         public ICommand ExitCommand { get; }
 
@@ -122,25 +121,90 @@ namespace WinResSelector.ViewModels
             _showWindow = showWindow;
             _closeWindow = closeWindow;
 
-            // 订阅配置保存事件
-            _configService.ConfigSaved += (s, e) =>
-            {
-                StatusMessage = e.Message;
-                StatusMessageColor = e.Success ? Brushes.Green : Brushes.Red;
-            };
-
             Profiles = new ObservableCollection<DisplayProfile>();
             AvailableResolutions = new ObservableCollection<DisplaySettings>();
 
             AddProfileCommand = new RelayCommand(AddProfile);
             DeleteProfileCommand = new RelayCommand<DisplayProfile>(DeleteProfile);
             TestProfileCommand = new RelayCommand<DisplayProfile>(TestProfile);
-            SaveCommand = new RelayCommand(Save);
             ShowWindowCommand = new RelayCommand(() => _showWindow());
             ExitCommand = new RelayCommand(() => _closeWindow());
 
+            // 监听属性变化自动保存
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(StartWithWindows) || e.PropertyName == nameof(MinimizeToTray))
+                {
+                    SaveSettings();
+                }
+            };
+
+            // 监听配置列表变化自动保存
+            Profiles.CollectionChanged += (s, e) => SaveProfiles();
+
             LoadData();
             UpdateCurrentResolution();
+        }
+
+        private void SaveSettings()
+        {
+            _configService.SaveSettings(new Models.AppSettings
+            {
+                StartWithWindows = StartWithWindows,
+                MinimizeToTray = MinimizeToTray
+            });
+        }
+
+        private void SaveProfiles()
+        {
+            _configService.SaveProfiles(new System.Collections.Generic.List<DisplayProfile>(Profiles));
+        }
+
+        private void AddProfile()
+        {
+            var profile = new DisplayProfile
+            {
+                Id = Profiles.Count + 1,
+                Display = AvailableResolutions.Count > 0 ? AvailableResolutions[0] : new DisplaySettings()
+            };
+            Profiles.Add(profile);
+            // 不需要手动调用 SaveProfiles，因为 CollectionChanged 事件会触发自动保存
+        }
+
+        private void DeleteProfile(DisplayProfile profile)
+        {
+            if (profile != null)
+            {
+                Profiles.Remove(profile);
+                // 重新排序 ID
+                for (int i = 0; i < Profiles.Count; i++)
+                {
+                    Profiles[i].Id = i + 1;
+                }
+                // 不需要手动调用 SaveProfiles，因为 CollectionChanged 事件会触发自动保存
+            }
+        }
+
+        private void TestProfile(DisplayProfile profile)
+        {
+            if (profile != null)
+            {
+                ApplyProfile(profile);
+            }
+        }
+
+        private void ApplyProfile(DisplayProfile profile)
+        {
+            if (profile?.Display != null)
+            {
+                bool success = _displayService.ChangeResolution(profile.Display);
+                if (!success)
+                {
+                    StatusMessage = "分辨率切换失败";
+                    StatusMessageColor = Brushes.Red;
+                }
+                UpdateCurrentResolution();
+            }
         }
 
         private void LoadData()
@@ -176,61 +240,6 @@ namespace WinResSelector.ViewModels
                 }
                 Profiles.Add(profile);
             }
-        }
-
-        private void AddProfile()
-        {
-            var profile = new DisplayProfile
-            {
-                Id = Profiles.Count + 1,
-                Display = AvailableResolutions.Count > 0 ? AvailableResolutions[0] : new DisplaySettings()
-            };
-            Profiles.Add(profile);
-        }
-
-        private void DeleteProfile(DisplayProfile profile)
-        {
-            if (profile != null)
-            {
-                Profiles.Remove(profile);
-                // 重新排序 ID
-                for (int i = 0; i < Profiles.Count; i++)
-                {
-                    Profiles[i].Id = i + 1;
-                }
-            }
-        }
-
-        private void TestProfile(DisplayProfile profile)
-        {
-            if (profile != null)
-            {
-                ApplyProfile(profile);
-            }
-        }
-
-        private void ApplyProfile(DisplayProfile profile)
-        {
-            if (profile?.Display != null)
-            {
-                bool success = _displayService.ChangeResolution(profile.Display);
-                if (!success)
-                {
-                    StatusMessage = "分辨率切换失败";
-                    StatusMessageColor = Brushes.Red;
-                }
-                UpdateCurrentResolution();
-            }
-        }
-
-        private void Save()
-        {
-            _configService.SaveProfiles(new System.Collections.Generic.List<DisplayProfile>(Profiles));
-            _configService.SaveSettings(new Models.AppSettings
-            {
-                StartWithWindows = StartWithWindows,
-                MinimizeToTray = MinimizeToTray
-            });
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
