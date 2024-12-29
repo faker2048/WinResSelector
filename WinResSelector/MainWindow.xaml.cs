@@ -10,6 +10,7 @@ namespace WinResSelector
     {
         private HotkeyService? _hotkeyService;
         private MainViewModel? _viewModel;
+        private const int WM_DISPLAYCHANGE = 0x007E;
 
         public MainWindow()
         {
@@ -54,10 +55,17 @@ namespace WinResSelector
         {
             const int WM_HOTKEY = 0x0312;
 
-            if (msg == WM_HOTKEY && _hotkeyService != null)
+            switch (msg)
             {
-                _hotkeyService.HandleHotkey(wParam);
-                handled = true;
+                case WM_HOTKEY when _hotkeyService != null:
+                    _hotkeyService.HandleHotkey(wParam);
+                    handled = true;
+                    break;
+                
+                case WM_DISPLAYCHANGE:
+                    _viewModel?.UpdateCurrentResolution();
+                    handled = true;
+                    break;
             }
 
             return IntPtr.Zero;

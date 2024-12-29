@@ -51,6 +51,25 @@ namespace WinResSelector.Services
         private const int DISP_CHANGE_RESTART = 1;
         private const int DISP_CHANGE_FAILED = -1;
 
+        public DisplaySettings GetCurrentResolution()
+        {
+            var dm = new DEVMODE();
+            dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+
+            if (EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref dm) != 0)
+            {
+                return new DisplaySettings
+                {
+                    Width = dm.dmPelsWidth,
+                    Height = dm.dmPelsHeight,
+                    ColorDepth = dm.dmBitsPerPel,
+                    RefreshRate = dm.dmDisplayFrequency
+                };
+            }
+
+            return new DisplaySettings();
+        }
+
         public List<DisplaySettings> GetAvailableResolutions()
         {
             var resolutions = new List<DisplaySettings>();
