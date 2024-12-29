@@ -11,8 +11,6 @@ namespace WinResSelector.Services
         private readonly string _configPath;
         private Config? _config;
 
-        public event EventHandler<SaveConfigEventArgs>? ConfigSaved;
-
         private class Config
         {
             public List<DisplayProfile> Profiles { get; set; } = new();
@@ -77,24 +75,11 @@ namespace WinResSelector.Services
             {
                 var json = JsonConvert.SerializeObject(_config, Formatting.Indented);
                 File.WriteAllText(_configPath, json);
-                ConfigSaved?.Invoke(this, new SaveConfigEventArgs(true, "配置已保存"));
             }
-            catch (Exception ex)
+            catch
             {
-                ConfigSaved?.Invoke(this, new SaveConfigEventArgs(false, $"保存失败: {ex.Message}"));
+                // 忽略保存错误
             }
         }
     }
-
-    public class SaveConfigEventArgs : EventArgs
-    {
-        public bool Success { get; }
-        public string Message { get; }
-
-        public SaveConfigEventArgs(bool success, string message)
-        {
-            Success = success;
-            Message = message;
-        }
-    }
-} 
+}
