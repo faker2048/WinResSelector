@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
+using System.Threading.Tasks;
 using WinResSelector.Models;
 using WinResSelector.Services;
 using System.Linq;
@@ -28,8 +29,38 @@ namespace WinResSelector.ViewModels
                 {
                     _statusMessage = value;
                     OnPropertyChanged();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        ClearStatusMessageAfterDelay();
+                    }
                 }
             }
+        }
+
+        private string _currentResolution = "";
+        public string CurrentResolution
+        {
+            get => _currentResolution;
+            set
+            {
+                if (_currentResolution != value)
+                {
+                    _currentResolution = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private async void ClearStatusMessageAfterDelay()
+        {
+            await Task.Delay(3000); // 3秒后清除消息
+            StatusMessage = "";
+        }
+
+        public void UpdateCurrentResolution()
+        {
+            var currentSettings = _displayService.GetCurrentResolution();
+            CurrentResolution = $"当前分辨率: {currentSettings}";
         }
 
         private Brush _statusMessageColor = Brushes.Black;
@@ -112,6 +143,7 @@ namespace WinResSelector.ViewModels
 
             LoadData();
             RegisterHotkeys();
+            UpdateCurrentResolution();
         }
 
         private void LoadData()
@@ -199,8 +231,12 @@ namespace WinResSelector.ViewModels
             if (profile?.Display != null)
             {
                 bool success = _displayService.ChangeResolution(profile.Display);
-                StatusMessage = success ? "分辨率切换成功" : "分辨率切换失败";
-                StatusMessageColor = success ? Brushes.Green : Brushes.Red;
+                if (!success)
+                {
+                    StatusMessage = "分辨率切换失败";
+                    StatusMessageColor = Brushes.Red;
+                }
+                UpdateCurrentResolution();
             }
         }
 
