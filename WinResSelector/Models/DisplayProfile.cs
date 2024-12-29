@@ -1,19 +1,11 @@
 using System.Windows.Input;
-using Newtonsoft.Json;
 
 namespace WinResSelector.Models
 {
     public class DisplayProfile
     {
         public int Id { get; set; }
-        public HotkeySettings Hotkey { get; set; } = new();
-        public DisplaySettings Display { get; set; } = new();
-    }
-
-    public class HotkeySettings
-    {
-        public Key Key { get; set; }
-        public ModifierKeys Modifiers { get; set; }
+        public DisplaySettings Display { get; set; } = new DisplaySettings();
     }
 
     public class DisplaySettings
@@ -25,7 +17,13 @@ namespace WinResSelector.Models
 
         public override string ToString()
         {
-            return $"{Width}x{Height} @ {RefreshRate}Hz ({ColorDepth}bit)";
+            return $"{Width}x{Height} {RefreshRate}Hz {ColorDepth}bit";
         }
+    }
+
+    public class AppSettings
+    {
+        public bool StartWithWindows { get; set; }
+        public bool MinimizeToTray { get; set; }
     }
 } 

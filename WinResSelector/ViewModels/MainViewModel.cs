@@ -15,7 +15,6 @@ namespace WinResSelector.ViewModels
     {
         private readonly ConfigService _configService;
         private readonly DisplayService _displayService;
-        private readonly HotkeyService _hotkeyService;
         private readonly Action _showWindow;
         private readonly Action _closeWindow;
 
@@ -115,12 +114,11 @@ namespace WinResSelector.ViewModels
         public ICommand ShowWindowCommand { get; }
         public ICommand ExitCommand { get; }
 
-        public MainViewModel(ConfigService configService, DisplayService displayService, 
-                           HotkeyService hotkeyService, Action showWindow, Action closeWindow)
+        public MainViewModel(ConfigService configService, DisplayService displayService,
+                           Action showWindow, Action closeWindow)
         {
             _configService = configService;
             _displayService = displayService;
-            _hotkeyService = hotkeyService;
             _showWindow = showWindow;
             _closeWindow = closeWindow;
 
@@ -142,7 +140,6 @@ namespace WinResSelector.ViewModels
             ExitCommand = new RelayCommand(() => _closeWindow());
 
             LoadData();
-            RegisterHotkeys();
             UpdateCurrentResolution();
         }
 
@@ -181,25 +178,11 @@ namespace WinResSelector.ViewModels
             }
         }
 
-        private void RegisterHotkeys()
-        {
-            _hotkeyService.UnregisterAll();
-            foreach (var profile in Profiles)
-            {
-                _hotkeyService.RegisterHotkey(profile.Hotkey, () => ApplyProfile(profile));
-            }
-        }
-
         private void AddProfile()
         {
             var profile = new DisplayProfile
             {
                 Id = Profiles.Count + 1,
-                Hotkey = new HotkeySettings
-                {
-                    Key = Key.D1,
-                    Modifiers = ModifierKeys.Control | ModifierKeys.Alt
-                },
                 Display = AvailableResolutions.Count > 0 ? AvailableResolutions[0] : new DisplaySettings()
             };
             Profiles.Add(profile);
@@ -243,12 +226,11 @@ namespace WinResSelector.ViewModels
         private void Save()
         {
             _configService.SaveProfiles(new System.Collections.Generic.List<DisplayProfile>(Profiles));
-            _configService.SaveSettings(new AppSettings
+            _configService.SaveSettings(new Models.AppSettings
             {
                 StartWithWindows = StartWithWindows,
                 MinimizeToTray = MinimizeToTray
             });
-            RegisterHotkeys();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
