@@ -1,0 +1,106 @@
+WinAPIEx UDF v3.7
+=================
+
+ADDED
+=====
+_WinAPI_AdjustBitmap
+_WinAPI_CreateColorAdjustment
+_WinAPI_BackupRead
+_WinAPI_BackupReadAbort
+_WinAPI_BackupSeek
+_WinAPI_BackupWrite
+_WinAPI_BackupWriteAbort
+_WinAPI_CompareString
+_WinAPI_CompressBuffer
+_WinAPI_ConfirmCredentials
+_WinAPI_CreateDirectory
+_WinAPI_CreateHardLink
+_WinAPI_CreateProcessWithToken
+_WinAPI_CreateSymbolicLink
+_WinAPI_DecompressBuffer
+_WinAPI_DecryptFile
+_WinAPI_DrawFocusRect
+_WinAPI_DuplicateEncryptionInfoFile
+_WinAPI_DuplicateTokenEx
+_WinAPI_EncryptFile
+_WinAPI_EncryptionDisable
+_WinAPI_EnumDisplayMonitors
+_WinAPI_EnumFiles
+_WinAPI_EnumFileStreams
+_WinAPI_EnumHardLinks
+_WinAPI_EnumSystemGeoID
+_WinAPI_FileEncryptionStatus
+_WinAPI_FindCloseChangeNotification
+_WinAPI_FindFirstChangeNotification
+_WinAPI_FindFirstFileName
+_WinAPI_FindNextChangeNotification
+_WinAPI_FindNextFileName
+_WinAPI_GetColorAdjustment
+_WinAPI_GetFileID
+_WinAPI_GetFilePointerEx
+_WinAPI_GetGeoInfo
+_WinAPI_GetGlyphOutline
+_WinAPI_GetMonitorInfo
+_WinAPI_GetObjectInfoByHandle
+_WinAPI_GetStretchBltMode
+_WinAPI_GetSystemDefaultLangID
+_WinAPI_GetThreadLocale
+_WinAPI_GetThreadUILanguage
+_WinAPI_GetUserDefaultLangID
+_WinAPI_GetUserGeoID
+_WinAPI_GetVolumeInformation
+_WinAPI_GetVolumeInformationByHandle
+_WinAPI_GetWindowRgnBox
+_WinAPI_HashData
+_WinAPI_HashString
+_WinAPI_IsElevated
+_WinAPI_LoadStringEx
+_WinAPI_MonitorFromPoint
+_WinAPI_MonitorFromRect
+_WinAPI_MonitorFromWindow
+_WinAPI_ParseURL
+_WinAPI_ParseUserName
+_WinAPI_ReadDirectoryChanges
+_WinAPI_SetColorAdjustment
+_WinAPI_SetFileShortName
+_WinAPI_SetThreadLocale
+_WinAPI_SetThreadUILanguage
+_WinAPI_SetUserGeoID
+_WinAPI_ShellUserAuthenticationDlg
+_WinAPI_ShellUserAuthenticationDlgEx
+_WinAPI_UrlApplyScheme
+_WinAPI_UrlCanonicalize
+_WinAPI_UrlCombine
+_WinAPI_UrlCompare
+_WinAPI_UrlHash
+_WinAPI_VerQueryValueEx
+
+DELETED
+=======
+_WinAPI_GetFileSize (use _WinAPI_GetFileSizeEx)
+_WinAPI_LZNTCompress (use _WinAPI_CompressBuffer)
+_WinAPI_LZNTDecompress (use _WinAPI_DecompressBuffer)
+_WinAPI_ResizeBitmap (use _WinAPI_AdjustBitmap)
+_WinAPI_ShutdownDlg (unnecessary)
+_WinAPI_UrlEscape (use _WinAPI_UrlCanonicalize)
+_WinAPI_UrlUnescape (use _WinAPI_UrlCanonicalize)
+
+FIXED
+=====
+Added $tagFILE_ID_DESCRIPTOR structure.
+Added one optional parameter in _WinAPI_RegSaveKey() function, see its description.
+Added one optional parameter in _WinAPI_GetFileVersionInfo() function, see its description.
+The third and fourth parameters in _WinAPI_OpenFileById() function are now optional (similar to _WinAPI_CreateFileEx()).
+The following functions now works with pointers instead of structures, see its description.
+
+_WinAPI_CompressBitmapBits
+_WinAPI_GetEnhMetaFileBits
+_WinAPI_GetFileVersionInfo
+_WinAPI_SetEnhMetaFileBits
+
+The _WinAPI_DeleteObjectID(), _WinAPI_RegRestoreKey(), and _WinAPI_RegSaveKey() functions are no longer enables the necessary privileges to themselves.
+The _WinAPI_GetCompression() function now returns (-1) instead of 0 if an error occured.
+The _WinAPI_OpenFileById() function now can work with file identifiers (FileID).
+The _WinAPI_SetStretchBltMode() function now returns the previous stretching mode.
+The _WinAPI_VerQueryRoot() and _WinAPI_VerQueryValue() functions has been rewrited to work with pointers, instead of files, see its description.
+Fixed some examples.
