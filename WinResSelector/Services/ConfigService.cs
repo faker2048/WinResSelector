@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Reflection;
 using Newtonsoft.Json;
 using WinResSelector.Models;
 
@@ -10,56 +9,73 @@ namespace WinResSelector.Services
     public class ConfigService
     {
         private readonly string _configPath;
-        private Config _currentConfig = new();
+        private Config? _config;
 
         public event EventHandler<SaveConfigEventArgs>? ConfigSaved;
 
+        private class Config
+        {
+            public List<DisplayProfile> Profiles { get; set; } = new();
+            public AppSettings Settings { get; set; } = new();
+        }
+
         public ConfigService()
         {
-            string exePath = Assembly.GetExecutingAssembly().Location;
-            string exeDir = Path.GetDirectoryName(exePath) ?? "";
-            _configPath = Path.Combine(exeDir, "config.json");
-            
-            _currentConfig = new Config
-            {
-                Profiles = new List<DisplayProfile>(),
-                Settings = new AppSettings
-                {
-                    StartWithWindows = false,
-                    MinimizeToTray = true
-                }
-            };
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var appFolder = Path.Combine(appData, "WinResSelector");
+            Directory.CreateDirectory(appFolder);
+            _configPath = Path.Combine(appFolder, "config.json");
         }
 
         public void LoadConfig()
         {
-            try
+            if (File.Exists(_configPath))
             {
-                if (File.Exists(_configPath))
+                try
                 {
-                    string json = File.ReadAllText(_configPath);
-                    var loadedConfig = JsonConvert.DeserializeObject<Config>(json);
-                    if (loadedConfig != null)
-                    {
-                        _currentConfig = loadedConfig;
-                    }
+                    var json = File.ReadAllText(_configPath);
+                    _config = JsonConvert.DeserializeObject<Config>(json);
                 }
-                else
+                catch
                 {
-                    SaveConfig();
+                    _config = new Config();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ConfigSaved?.Invoke(this, new SaveConfigEventArgs(false, ex.Message));
+                _config = new Config();
             }
         }
 
-        public void SaveConfig()
+        public List<DisplayProfile> GetProfiles()
+        {
+            return _config?.Profiles ?? new List<DisplayProfile>();
+        }
+
+        public AppSettings GetSettings()
+        {
+            return _config?.Settings ?? new AppSettings();
+        }
+
+        public void SaveProfiles(List<DisplayProfile> profiles)
+        {
+            if (_config == null) _config = new Config();
+            _config.Profiles = profiles;
+            SaveConfig();
+        }
+
+        public void SaveSettings(AppSettings settings)
+        {
+            if (_config == null) _config = new Config();
+            _config.Settings = settings;
+            SaveConfig();
+        }
+
+        private void SaveConfig()
         {
             try
             {
-                string json = JsonConvert.SerializeObject(_currentConfig, Formatting.Indented);
+                var json = JsonConvert.SerializeObject(_config, Formatting.Indented);
                 File.WriteAllText(_configPath, json);
                 ConfigSaved?.Invoke(this, new SaveConfigEventArgs(true, "配置已保存"));
             }
@@ -68,40 +84,6 @@ namespace WinResSelector.Services
                 ConfigSaved?.Invoke(this, new SaveConfigEventArgs(false, $"保存失败: {ex.Message}"));
             }
         }
-
-        public List<DisplayProfile> GetProfiles()
-        {
-            return _currentConfig.Profiles;
-        }
-
-        public void SaveProfiles(List<DisplayProfile> profiles)
-        {
-            _currentConfig.Profiles = profiles;
-            SaveConfig();
-        }
-
-        public AppSettings GetSettings()
-        {
-            return _currentConfig.Settings;
-        }
-
-        public void SaveSettings(AppSettings settings)
-        {
-            _currentConfig.Settings = settings;
-            SaveConfig();
-        }
-    }
-
-    public class Config
-    {
-        public List<DisplayProfile> Profiles { get; set; } = new();
-        public AppSettings Settings { get; set; } = new();
-    }
-
-    public class AppSettings
-    {
-        public bool StartWithWindows { get; set; }
-        public bool MinimizeToTray { get; set; }
     }
 
     public class SaveConfigEventArgs : EventArgs
