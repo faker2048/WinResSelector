@@ -71,6 +71,17 @@
                 <ContextMenu>
                     <MenuItem Header="显示窗口" Command="{Binding ShowWindowCommand}" />
                     <Separator />
+                    <ItemsControl ItemsSource="{Binding Profiles}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <MenuItem Header="{Binding Display}" 
+                                        Command="{Binding DataContext.TestProfileCommand, 
+                                                  RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                        CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Separator />
                     <MenuItem Header="退出" Command="{Binding ExitCommand}" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
