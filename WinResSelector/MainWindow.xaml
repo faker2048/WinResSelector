@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:WinResSelector"
         mc:Ignorable="d"
         Title="WinResSelector" Height="450" Width="400"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Icon="/Resources/icon.ico">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -64,6 +65,7 @@
         </StackPanel>
 
         <tb:TaskbarIcon x:Name="NotifyIcon"
+                        IconSource="/Resources/icon.ico"
                         ToolTipText="WinResSelector">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
