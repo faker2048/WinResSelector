@@ -128,19 +128,7 @@ namespace WinResSelector.ViewModels
             DeleteProfileCommand = new RelayCommand<DisplayProfile>(DeleteProfile);
             TestProfileCommand = new RelayCommand<DisplayProfile>(TestProfile);
             ShowWindowCommand = new RelayCommand(() => _showWindow());
-            ExitCommand = new RelayCommand(() => _closeWindow());
-
-            // 监听属性变化自动保存
-            PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(StartWithWindows) || e.PropertyName == nameof(MinimizeToTray))
-                {
-                    SaveSettings();
-                }
-            };
-
-            // 监听配置列表变化自动保存
-            Profiles.CollectionChanged += (s, e) => SaveProfiles();
+            ExitCommand = new RelayCommand(Exit);
 
             LoadData();
             UpdateCurrentResolution();
@@ -168,7 +156,6 @@ namespace WinResSelector.ViewModels
                 Display = AvailableResolutions.Count > 0 ? AvailableResolutions[0] : new DisplaySettings()
             };
             Profiles.Add(profile);
-            // 不需要手动调用 SaveProfiles，因为 CollectionChanged 事件会触发自动保存
         }
 
         private void DeleteProfile(DisplayProfile profile)
@@ -181,7 +168,6 @@ namespace WinResSelector.ViewModels
                 {
                     Profiles[i].Id = i + 1;
                 }
-                // 不需要手动调用 SaveProfiles，因为 CollectionChanged 事件会触发自动保存
             }
         }
 
@@ -240,6 +226,14 @@ namespace WinResSelector.ViewModels
                 }
                 Profiles.Add(profile);
             }
+        }
+
+        private void Exit()
+        {
+            SaveSettings();
+            SaveProfiles();
+            _configService.SaveConfigIfNeeded();
+            _closeWindow();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
