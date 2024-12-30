@@ -10,6 +10,7 @@ namespace WinResSelector.Services
     {
         private readonly string _configPath;
         private Config? _config;
+        private bool _isDirty; // 标记配置是否被修改
 
         private class Config
         {
@@ -43,6 +44,7 @@ namespace WinResSelector.Services
             {
                 _config = new Config();
             }
+            _isDirty = false;
         }
 
         public List<DisplayProfile> GetProfiles()
@@ -59,22 +61,25 @@ namespace WinResSelector.Services
         {
             if (_config == null) _config = new Config();
             _config.Profiles = profiles;
-            SaveConfig();
+            _isDirty = true;
         }
 
         public void SaveSettings(AppSettings settings)
         {
             if (_config == null) _config = new Config();
             _config.Settings = settings;
-            SaveConfig();
+            _isDirty = true;
         }
 
-        private void SaveConfig()
+        public void SaveConfigIfNeeded()
         {
+            if (!_isDirty) return;
+            
             try
             {
                 var json = JsonConvert.SerializeObject(_config, Formatting.Indented);
                 File.WriteAllText(_configPath, json);
+                _isDirty = false;
             }
             catch
             {

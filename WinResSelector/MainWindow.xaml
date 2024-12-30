@@ -16,12 +16,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
             <CheckBox Content="开机启动" IsChecked="{Binding StartWithWindows}" />
             <CheckBox Content="最小化到托盘" IsChecked="{Binding MinimizeToTray}" />
         </StackPanel>
 
-        <Border Grid.Row="0" Background="White" Padding="8,4" Margin="0,0,0,10">
+        <Border Grid.Row="1" Background="White" Padding="8,4" Margin="0,0,0,10">
             <TextBlock Text="{Binding CurrentResolution}" FontWeight="SemiBold" />
         </Border>
 
