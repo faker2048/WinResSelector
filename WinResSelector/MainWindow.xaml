@@ -66,7 +66,8 @@
 
         <tb:TaskbarIcon x:Name="NotifyIcon"
                         IconSource="/Resources/icon.ico"
-                        ToolTipText="WinResSelector">
+                        ToolTipText="WinResSelector"
+                        TrayLeftMouseDown="NotifyIcon_TrayLeftMouseDown">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="显示窗口" Command="{Binding ShowWindowCommand}" />

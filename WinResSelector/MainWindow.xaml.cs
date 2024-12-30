@@ -40,5 +40,11 @@ namespace WinResSelector
                 };
             };
         }
+
+        private void NotifyIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
+        {
+            Show();
+            WindowState = WindowState.Normal;
+        }
     }
 }
