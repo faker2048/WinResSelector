@@ -10,65 +10,66 @@
         WindowStartupLocation="CenterScreen">
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="#F0F0F0" Padding="8,4" Margin="0,0,0,10">
-            <TextBlock Text="{Binding CurrentResolution}" FontWeight="SemiBold"/>
-        </Border>
-
         <StackPanel Grid.Row="1" Margin="0,0,0,10">
-            <CheckBox Content="开机启动" IsChecked="{Binding StartWithWindows}"/>
-            <CheckBox Content="最小化到托盘" IsChecked="{Binding MinimizeToTray}"/>
+            <CheckBox Content="开机启动" IsChecked="{Binding StartWithWindows}" />
+            <CheckBox Content="最小化到托盘" IsChecked="{Binding MinimizeToTray}" />
         </StackPanel>
+
+        <Border Grid.Row="0" Background="White" Padding="8,4" Margin="0,0,0,10">
+            <TextBlock Text="{Binding CurrentResolution}" FontWeight="SemiBold" />
+        </Border>
 
         <ListView Grid.Row="2" ItemsSource="{Binding Profiles}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        
-                        <TextBlock Grid.Column="0" Text="{Binding Id}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        
+
+                        <TextBlock Grid.Column="0" Text="{Binding Id}" VerticalAlignment="Center" Margin="0,0,10,0" />
+
                         <StackPanel Grid.Column="1">
-                            <ComboBox ItemsSource="{Binding DataContext.AvailableResolutions, 
+                            <ComboBox
+                                ItemsSource="{Binding DataContext.AvailableResolutions, 
                                       RelativeSource={RelativeSource AncestorType=Window}}"
-                                    SelectedItem="{Binding Display}"/>
+                                SelectedItem="{Binding Display}" />
                         </StackPanel>
-                        
-                        <Button Grid.Column="2" Content="测试" Width="40" Height="22" Margin="5,0"
+
+                        <Button Grid.Column="2" Content="切换" Width="40" Height="22" Margin="5,0"
                                 Command="{Binding DataContext.TestProfileCommand, 
                                           RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding}"/>
-                        
+                                CommandParameter="{Binding}" />
+
                         <Button Grid.Column="3" Content="删除" Width="40" Height="22"
                                 Command="{Binding DataContext.DeleteProfileCommand, 
                                           RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding}"/>
+                                CommandParameter="{Binding}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="添加配置" Width="80" Height="28" Command="{Binding AddProfileCommand}"/>
+            <Button Content="添加配置" Width="80" Height="28" Command="{Binding AddProfileCommand}" />
         </StackPanel>
 
         <tb:TaskbarIcon x:Name="NotifyIcon"
                         ToolTipText="WinResSelector">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="显示窗口" Command="{Binding ShowWindowCommand}"/>
-                    <Separator/>
-                    <MenuItem Header="退出" Command="{Binding ExitCommand}"/>
+                    <MenuItem Header="显示窗口" Command="{Binding ShowWindowCommand}" />
+                    <Separator />
+                    <MenuItem Header="退出" Command="{Binding ExitCommand}" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

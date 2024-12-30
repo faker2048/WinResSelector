@@ -53,8 +53,10 @@ namespace WinResSelector.Services
 
         public DisplaySettings GetCurrentResolution()
         {
-            var dm = new DEVMODE();
-            dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+            var dm = new DEVMODE
+            {
+                dmSize = (short)Marshal.SizeOf(typeof(DEVMODE))
+            };
 
             if (EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref dm) != 0)
             {
@@ -73,8 +75,10 @@ namespace WinResSelector.Services
         public List<DisplaySettings> GetAvailableResolutions()
         {
             var resolutions = new List<DisplaySettings>();
-            var dm = new DEVMODE();
-            dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+            var dm = new DEVMODE
+            {
+                dmSize = (short)Marshal.SizeOf(typeof(DEVMODE))
+            };
 
             int modeNum = 0;
             while (EnumDisplaySettings(null, modeNum, ref dm) != 0)
@@ -104,8 +108,10 @@ namespace WinResSelector.Services
 
         public bool ChangeResolution(DisplaySettings settings)
         {
-            var dm = new DEVMODE();
-            dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+            var dm = new DEVMODE
+            {
+                dmSize = (short)Marshal.SizeOf(typeof(DEVMODE))
+            };
 
             if (EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref dm) != 0)
             {
