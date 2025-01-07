@@ -21,13 +21,19 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
+    - name: Change to project directory
+      run: cd WinResSelector
+    
     - name: Restore dependencies
+      working-directory: ./WinResSelector
       run: dotnet restore
     
     - name: Build
+      working-directory: ./WinResSelector
       run: dotnet build -c Release --no-restore
     
     - name: Publish
+      working-directory: ./WinResSelector
       run: dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true /p:PublishReadyToRun=true
     
     - name: Create Release
