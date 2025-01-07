@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 env:
   DOTNET_VERSION: '6.0.x'
   SOLUTION_NAME: 'WinResSelector'
