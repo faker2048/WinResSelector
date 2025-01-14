@@ -14,7 +14,7 @@ namespace WinResSelector.Services
 
         private class Config
         {
-            public List<DisplayProfile> Profiles { get; set; } = new();
+            public List<DisplayProfile?> Profiles { get; set; } = new();
             public AppSettings Settings { get; set; } = new();
         }
 
@@ -47,9 +47,9 @@ namespace WinResSelector.Services
             _isDirty = false;
         }
 
-        public List<DisplayProfile> GetProfiles()
+        public List<DisplayProfile?> GetProfiles()
         {
-            return _config?.Profiles ?? new List<DisplayProfile>();
+            return _config?.Profiles ?? new List<DisplayProfile?>();
         }
 
         public AppSettings GetSettings()
@@ -57,7 +57,7 @@ namespace WinResSelector.Services
             return _config?.Settings ?? new AppSettings();
         }
 
-        public void SaveProfiles(List<DisplayProfile> profiles)
+        public void SaveProfiles(List<DisplayProfile?> profiles)
         {
             if (_config == null) _config = new Config();
             _config.Profiles = profiles;

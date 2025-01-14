@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -25,14 +26,11 @@ namespace WinResSelector.ViewModels
 
         [ObservableProperty]
         private Brush _statusMessageColor = Brushes.Black;
-
-        [ObservableProperty]
-        private bool _startWithWindows;
-
+        
         [ObservableProperty]
         private bool _minimizeToTray;
 
-        public ObservableCollection<DisplayProfile> Profiles { get; }
+        public ObservableCollection<DisplayProfile?> Profiles { get; }
         public ObservableCollection<DisplaySettings> AvailableResolutions { get; }
 
         public MainViewModel(ConfigService configService, DisplayService displayService,
@@ -43,7 +41,7 @@ namespace WinResSelector.ViewModels
             _showWindow = showWindow;
             _closeWindow = closeWindow;
 
-            Profiles = new ObservableCollection<DisplayProfile>();
+            Profiles = new ObservableCollection<DisplayProfile?>();
             AvailableResolutions = new ObservableCollection<DisplaySettings>();
 
             LoadData();
@@ -74,14 +72,13 @@ namespace WinResSelector.ViewModels
         {
             _configService.SaveSettings(new Models.AppSettings
             {
-                StartWithWindows = StartWithWindows,
                 MinimizeToTray = MinimizeToTray
             });
         }
 
         private void SaveProfiles()
         {
-            _configService.SaveProfiles(new System.Collections.Generic.List<DisplayProfile>(Profiles));
+            _configService.SaveProfiles(new List<DisplayProfile?>(Profiles));
         }
 
         [RelayCommand]
@@ -96,16 +93,14 @@ namespace WinResSelector.ViewModels
         }
 
         [RelayCommand]
-        private void DeleteProfile(DisplayProfile profile)
+        private void DeleteProfile(DisplayProfile? profile)
         {
-            if (profile != null)
+            if (profile == null) return;
+            Profiles.Remove(profile);
+            // 重新排序 ID
+            for (var i = 0; i < Profiles.Count; i++)
             {
-                Profiles.Remove(profile);
-                // 重新排序 ID
-                for (int i = 0; i < Profiles.Count; i++)
-                {
-                    Profiles[i].Id = i + 1;
-                }
+                Profiles[i]!.Id = i + 1;
             }
         }
 
@@ -135,16 +130,14 @@ namespace WinResSelector.ViewModels
 
         private void ApplyProfile(DisplayProfile profile)
         {
-            if (profile?.Display != null)
+            if (profile?.Display == null) return;
+            var success = _displayService.ChangeResolution(profile.Display);
+            if (!success)
             {
-                bool success = _displayService.ChangeResolution(profile.Display);
-                if (!success)
-                {
-                    StatusMessage = "分辨率切换失败";
-                    StatusMessageColor = Brushes.Red;
-                }
-                UpdateCurrentResolution();
+                StatusMessage = "分辨率切换失败";
+                StatusMessageColor = Brushes.Red;
             }
+            UpdateCurrentResolution();
         }
 
         private void LoadData()
@@ -160,13 +153,13 @@ namespace WinResSelector.ViewModels
             // 再加载配置
             _configService.LoadConfig();
             var settings = _configService.GetSettings();
-            StartWithWindows = settings.StartWithWindows;
             MinimizeToTray = settings.MinimizeToTray;
 
             var profiles = _configService.GetProfiles();
             Profiles.Clear();
             foreach (var profile in profiles)
             {
+                if (profile == null) continue;
                 // 查找匹配的分辨率
                 var matchingResolution = AvailableResolutions.FirstOrDefault(r =>
                     r.Width == profile.Display.Width &&

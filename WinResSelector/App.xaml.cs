@@ -9,12 +9,7 @@ namespace WinResSelector
 {
     public partial class App : Application
     {
-        public IServiceProvider Services { get; }
-
-        public App()
-        {
-            Services = ConfigureServices();
-        }
+        public IServiceProvider Services { get; } = ConfigureServices();
 
         private static IServiceProvider ConfigureServices()
         {

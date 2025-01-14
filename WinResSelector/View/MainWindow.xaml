@@ -183,9 +183,6 @@
                              Foreground="#B9BBBE" 
                              FontSize="12"
                              Margin="0,0,0,8"/>
-                    <CheckBox Content="开机启动" 
-                            IsChecked="{Binding StartWithWindows}"
-                            Margin="0,4"/>
                     <CheckBox Content="最小化到托盘" 
                             IsChecked="{Binding MinimizeToTray}"
                             Margin="0,4"/>

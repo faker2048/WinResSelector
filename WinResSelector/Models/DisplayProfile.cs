@@ -23,7 +23,6 @@ namespace WinResSelector.Models
 
     public class AppSettings
     {
-        public bool StartWithWindows { get; init; }
         public bool MinimizeToTray { get; init; }
     }
 } 
