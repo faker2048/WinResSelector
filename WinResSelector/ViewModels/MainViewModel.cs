@@ -1,117 +1,39 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Media;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WinResSelector.Models;
 using WinResSelector.Services;
-using System.Linq;
 
 namespace WinResSelector.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public partial class MainViewModel : ObservableObject
     {
         private readonly ConfigService _configService;
         private readonly DisplayService _displayService;
         private readonly Action _showWindow;
         private readonly Action _closeWindow;
 
+        [ObservableProperty]
         private string _statusMessage = "";
-        public string StatusMessage
-        {
-            get => _statusMessage;
-            set
-            {
-                if (_statusMessage != value)
-                {
-                    _statusMessage = value;
-                    OnPropertyChanged();
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        ClearStatusMessageAfterDelay();
-                    }
-                }
-            }
-        }
 
+        [ObservableProperty]
         private string _currentResolution = "";
-        public string CurrentResolution
-        {
-            get => _currentResolution;
-            set
-            {
-                if (_currentResolution != value)
-                {
-                    _currentResolution = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
-        private async void ClearStatusMessageAfterDelay()
-        {
-            await Task.Delay(3000); // 3秒后清除消息
-            StatusMessage = "";
-        }
-
-        public void UpdateCurrentResolution()
-        {
-            var currentSettings = _displayService.GetCurrentResolution();
-            CurrentResolution = $"当前分辨率: {currentSettings}";
-        }
-
+        [ObservableProperty]
         private Brush _statusMessageColor = Brushes.Black;
-        public Brush StatusMessageColor
-        {
-            get => _statusMessageColor;
-            set
-            {
-                if (_statusMessageColor != value)
-                {
-                    _statusMessageColor = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
+        [ObservableProperty]
         private bool _startWithWindows;
-        public bool StartWithWindows
-        {
-            get => _startWithWindows;
-            set
-            {
-                if (_startWithWindows != value)
-                {
-                    _startWithWindows = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
+        [ObservableProperty]
         private bool _minimizeToTray;
-        public bool MinimizeToTray
-        {
-            get => _minimizeToTray;
-            set
-            {
-                if (_minimizeToTray != value)
-                {
-                    _minimizeToTray = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         public ObservableCollection<DisplayProfile> Profiles { get; }
         public ObservableCollection<DisplaySettings> AvailableResolutions { get; }
-
-        public ICommand AddProfileCommand { get; }
-        public ICommand DeleteProfileCommand { get; }
-        public ICommand TestProfileCommand { get; }
-        public ICommand ShowWindowCommand { get; }
-        public ICommand ExitCommand { get; }
 
         public MainViewModel(ConfigService configService, DisplayService displayService,
                            Action showWindow, Action closeWindow)
@@ -124,14 +46,28 @@ namespace WinResSelector.ViewModels
             Profiles = new ObservableCollection<DisplayProfile>();
             AvailableResolutions = new ObservableCollection<DisplaySettings>();
 
-            AddProfileCommand = new RelayCommand(AddProfile);
-            DeleteProfileCommand = new RelayCommand<DisplayProfile>(DeleteProfile);
-            TestProfileCommand = new RelayCommand<DisplayProfile>(TestProfile);
-            ShowWindowCommand = new RelayCommand(() => _showWindow());
-            ExitCommand = new RelayCommand(Exit);
-
             LoadData();
             UpdateCurrentResolution();
+        }
+
+        private async void ClearStatusMessageAfterDelay()
+        {
+            await Task.Delay(3000); // 3秒后清除消息
+            StatusMessage = "";
+        }
+
+        partial void OnStatusMessageChanged(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                ClearStatusMessageAfterDelay();
+            }
+        }
+
+        public void UpdateCurrentResolution()
+        {
+            var currentSettings = _displayService.GetCurrentResolution();
+            CurrentResolution = $"当前分辨率: {currentSettings}";
         }
 
         private void SaveSettings()
@@ -148,6 +84,7 @@ namespace WinResSelector.ViewModels
             _configService.SaveProfiles(new System.Collections.Generic.List<DisplayProfile>(Profiles));
         }
 
+        [RelayCommand]
         private void AddProfile()
         {
             var profile = new DisplayProfile
@@ -158,6 +95,7 @@ namespace WinResSelector.ViewModels
             Profiles.Add(profile);
         }
 
+        [RelayCommand]
         private void DeleteProfile(DisplayProfile profile)
         {
             if (profile != null)
@@ -171,12 +109,28 @@ namespace WinResSelector.ViewModels
             }
         }
 
+        [RelayCommand]
         private void TestProfile(DisplayProfile profile)
         {
             if (profile != null)
             {
                 ApplyProfile(profile);
             }
+        }
+
+        [RelayCommand]
+        private void ShowWindow()
+        {
+            _showWindow();
+        }
+
+        [RelayCommand]
+        private void Exit()
+        {
+            SaveSettings();
+            SaveProfiles();
+            _configService.SaveConfigIfNeeded();
+            _closeWindow();
         }
 
         private void ApplyProfile(DisplayProfile profile)
@@ -226,79 +180,6 @@ namespace WinResSelector.ViewModels
                 }
                 Profiles.Add(profile);
             }
-        }
-
-        private void Exit()
-        {
-            SaveSettings();
-            SaveProfiles();
-            _configService.SaveConfigIfNeeded();
-            _closeWindow();
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public class RelayCommand : ICommand
-    {
-        private readonly Action _execute;
-        private readonly Func<bool>? _canExecute;
-
-        public RelayCommand(Action execute, Func<bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return _canExecute?.Invoke() ?? true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute();
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-    }
-
-    public class RelayCommand<T> : ICommand
-    {
-        private readonly Action<T> _execute;
-        private readonly Func<T, bool>? _canExecute;
-
-        public RelayCommand(Action<T> execute, Func<T, bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return parameter is T typedParameter && (_canExecute?.Invoke(typedParameter) ?? true);
-        }
-
-        public void Execute(object? parameter)
-        {
-            if (parameter is T typedParameter)
-            {
-                _execute(typedParameter);
-            }
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
         }
     }
 } 

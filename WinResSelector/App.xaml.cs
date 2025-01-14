@@ -1,27 +1,50 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using System;
 using System.Windows;
-using System.Diagnostics;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using WinResSelector.Services;
+using WinResSelector.ViewModels;
+using WinResSelector.View;
 
-namespace WinResSelector;
-
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
-public partial class App : Application
+namespace WinResSelector
 {
-    protected override void OnStartup(StartupEventArgs e)
+    public partial class App : Application
     {
-        string procName = Process.GetCurrentProcess().ProcessName;
-        if (Process.GetProcessesByName(procName).Count() > 1)
+        public IServiceProvider Services { get; }
+
+        public App()
         {
-            MessageBox.Show("程序已经在运行啦~ 🎈\n不需要重复启动哦 (｡◕‿◕｡)", "温馨提示 ✨", MessageBoxButton.OK, MessageBoxImage.Information);
-            Current.Shutdown();
-            return;
+            Services = ConfigureServices();
         }
 
-        base.OnStartup(e);
+        private static IServiceProvider ConfigureServices()
+        {
+            var services = new ServiceCollection();
+
+            // 注册服务
+            services.AddSingleton<ConfigService>();
+            services.AddSingleton<DisplayService>();
+
+            // 注册 ViewModel
+            services.AddSingleton<MainViewModel>(sp => new MainViewModel(
+                sp.GetRequiredService<ConfigService>(),
+                sp.GetRequiredService<DisplayService>(),
+                () => sp.GetRequiredService<MainWindow>().Show(),
+                () => Current.Shutdown()
+            ));
+
+            // 注册视图
+            services.AddSingleton<MainWindow>();
+
+            return services.BuildServiceProvider();
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var mainWindow = Services.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+        }
     }
 }
 

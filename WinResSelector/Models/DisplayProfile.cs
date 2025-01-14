@@ -10,10 +10,10 @@ namespace WinResSelector.Models
 
     public class DisplaySettings
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int ColorDepth { get; set; }
-        public int RefreshRate { get; set; }
+        public int Width { get; init; }
+        public int Height { get; init; }
+        public int ColorDepth { get; init; }
+        public int RefreshRate { get; init; }
 
         public override string ToString()
         {
@@ -23,7 +23,7 @@ namespace WinResSelector.Models
 
     public class AppSettings
     {
-        public bool StartWithWindows { get; set; }
-        public bool MinimizeToTray { get; set; }
+        public bool StartWithWindows { get; init; }
+        public bool MinimizeToTray { get; init; }
     }
 } 
