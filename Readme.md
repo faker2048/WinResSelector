@@ -1,16 +1,8 @@
 # WinResSelector
 
-一款简洁优雅的 Windows 分辨率快速切换工具。
+一款简洁的 Windows 分辨率快速切换小工具。
 
 A sleek Windows resolution switcher utility.
-
-## ✨ 特性 | Features
-
-- 🎯 快速切换显示器分辨率 | Quick resolution switching
-- 💾 保存常用分辨率配置 | Save frequently used resolution profiles
-- 🔄 系统托盘快捷切换 | Quick access from system tray
-- 🎨 现代化界面设计 | Modern UI design
-- 🚀 轻量级且高效 | Lightweight and efficient
 
 ## 🖼️ 预览 | Preview
 
