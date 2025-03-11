@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/e91617f1-32c2-4b82-bbca-7808802e04e3)# WinResSelector
+# WinResSelector
 
 一款简洁的 Windows 分辨率快速切换小工具。
 
