@@ -5,8 +5,9 @@ A lightweight WPF-based Windows resolution switcher utility. Switch resolutions 
 
 ## 🖼️ 预览 | Preview
 
-<img src="https://github.com/faker2048/WinResSelector/raw/main/screenshots/main-window.png" alt="WinResSelector main window screenshot">  
-<img src="https://github.com/faker2048/WinResSelector/raw/main/screenshots/tray-icon.png" alt="WinResSelector system tray icon">
+![主窗口截图](https://github.com/user-attachments/assets/9c41a982-04d3-4756-83c9-1df7ffc0e1b5)
+
+![托盘图标截图](tray.png)
 
 ## 🚀 开始使用 | Getting Started
 
